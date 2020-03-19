@@ -10,7 +10,7 @@ public class PlayerController : MonoBehaviour
     private Animator anim;
     private Vector3 moveDir = Vector3.zero;
 
-    [SerializeField] public UnityEvent onInteraction;
+    // [SerializeField] public UnityEvent onInteraction;
 
     [Header("Player Movement Controls")]
     [SerializeField] public float speed = 4f;
@@ -19,24 +19,35 @@ public class PlayerController : MonoBehaviour
     [SerializeField] public float radarDistance = 1.5f;
 
     [Header("Player Keybinds")]
-    [SerializeField] public KeyCode interaction = KeyCode.Space;
+    [SerializeField] public KeyCode interactionKey = KeyCode.Space;
 
-
+    private bool isSitting;
 
     void Start()
     {
         //m_RigidBody = GetComponent<Rigidbody>;
+        isSitting = false;
         controller = GetComponent<CharacterController>();
         anim       = GetComponent<Animator>();
     }
 
     void Update()
     {
-        move();
-       // interact();
-
+        if (anim.GetInteger("sit") == 1)
+            SitUpdate();
+        else
+            move();
     }
 
+    void SitUpdate()
+    {
+        if (Input.GetAxis("Vertical") != 0 && anim.GetInteger("sit") == 1)
+        {
+            anim.SetInteger("sit", 0);
+            anim.SetInteger("walk", 1);
+        }
+
+    }
     void move()
     {
 
@@ -59,13 +70,33 @@ public class PlayerController : MonoBehaviour
         controller.Move(moveDir * Time.deltaTime);
     }
 
-    private void interact()
+    private void OnTriggerStay(Collider other)
     {
-        if (Input.GetKeyDown(interaction))    //TODO: delete/replace code with nontesting code
+        
+        if (other.gameObject.CompareTag("chair"))
         {
-            onInteraction.Invoke();
+            print("chair");
+
+            if (Input.GetKey(interactionKey) && anim.GetInteger("sit") == 0)
+            {
+                transform.position = other.transform.position;
+                transform.rotation = other.transform.rotation;
+
+                print("sit");
+                anim.SetInteger("sit", 1);
+
+            }
+            
         }
     }
+
+    //private void OnTriggerExit(Collider other)
+    //{
+    //    if (other.gameObject.CompareTag("chair"))
+    //    {
+    //        anim.SetInteger("sit", 0);
+    //    }
+    //}
 
 
 }
