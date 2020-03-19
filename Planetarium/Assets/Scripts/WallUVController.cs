@@ -10,6 +10,7 @@ public class WallUVController : MonoBehaviour
 
     private Vector2 neutral;
     private Vector2 currentOffset;
+
     // Start is called before the first frame update
     void Start()
     {
